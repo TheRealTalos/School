@@ -67,7 +67,7 @@ public class Game {
 		while(!glfwWindowShouldClose(window)){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			//main loop
+			
 			
 			glfwSwapBuffers(window);
 			glfwPollEvents();
