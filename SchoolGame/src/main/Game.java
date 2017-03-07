@@ -5,6 +5,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import java.io.FileReader;
 import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -64,13 +65,42 @@ public class Game {
 		
 		glClearColor(0,0,0,0);
 		
+		float[] vertices = new float[]{
+			0.5f,	0.5f,
+			0.5f,	-0.5f,
+			-0.5f,	-0.5f,
+			-0.5f,	0.5f,
+		};
+		
+		float[] sprite = new float[]{
+				0, 0,
+				1, 0,
+				1, 1,
+				
+				0, 0,
+				0, 1,
+				1, 1,
+		};
+		
+		int[] indices = new int[]{
+				0,1,2,
+				2,3,0,
+		};
+		
+		Model model = new Model(vertices, sprite, indices);
+		
+		Sprite pac = new Sprite("./res/sprites/PacMan.png");
+		
 		while(!glfwWindowShouldClose(window)){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
+			glfwPollEvents();
 			
+			pac.bind();
+			
+			model.render();
 			
 			glfwSwapBuffers(window);
-			glfwPollEvents();
 		}
 		
 	}
