@@ -88,16 +88,18 @@ public class Game {
 		};
 		
 		Model model = new Model(vertices, sprite, indices);
+		Shader shader = new Shader("shader");
 		
-		Sprite pac = new Sprite("./res/sprites/PacMan.png");
+		//Sprite pac = new Sprite("./res/sprites/PacMan.png");
 		
 		while(!glfwWindowShouldClose(window)){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			glfwPollEvents();
 			
-			pac.bind();
+			//pac.bind();
 			
+			shader.bind();
 			model.render();
 			
 			glfwSwapBuffers(window);
