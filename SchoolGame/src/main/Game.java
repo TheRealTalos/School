@@ -1,5 +1,7 @@
 package main;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -17,6 +19,9 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Game {
 	
 	private long window;
+	
+	private static final int WIDTH = 960;
+	private static final int HEIGHT = 540;
 	
 	public Game(){
 		
@@ -66,20 +71,17 @@ public class Game {
 		glClearColor(0,0,0,0);
 		
 		float[] vertices = new float[]{
-			0.5f,	0.5f,
-			0.5f,	-0.5f,
-			-0.5f,	-0.5f,
-			-0.5f,	0.5f,
+			-0.5f,	0.5f, 0,
+			0.5f,	0.5f, 0,
+			0.5f,	-0.5f, 0, 
+			-0.5f,	-0.5f, 0,
 		};
 		
 		float[] sprite = new float[]{
 				0, 0,
 				1, 0,
 				1, 1,
-				
-				0, 0,
 				0, 1,
-				1, 1,
 		};
 		
 		int[] indices = new int[]{
@@ -87,19 +89,32 @@ public class Game {
 				2,3,0,
 		};
 		
+		Camera camera = new Camera(WIDTH, HEIGHT);
+		
 		Model model = new Model(vertices, sprite, indices);
 		Shader shader = new Shader("shader");
 		
-		//Sprite pac = new Sprite("./res/sprites/PacMan.png");
+		Sprite pac = new Sprite("./res/sprites/PacMan.png");
+		
+		Matrix4f scale = new Matrix4f()
+				.translate(new Vector3f(0, 0, 0))
+				.scale(512);
+		
+		Matrix4f target = new Matrix4f();
+		
+		camera.setPosition(new Vector3f(0, 0, 0));
 		
 		while(!glfwWindowShouldClose(window)){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			glfwPollEvents();
 			
-			//pac.bind();
+			target = scale;
 			
 			shader.bind();
+			shader.setUniform("sampler", 0);
+			shader.setUniform("projection", camera.getProjection().mul(target));
+			pac.bind(0);
 			model.render();
 			
 			glfwSwapBuffers(window);
