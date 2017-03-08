@@ -18,11 +18,6 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Game {
 	
-	private long window;
-	
-	private static final int WIDTH = 960;
-	private static final int HEIGHT = 540;
-	
 	public Game(){
 		
 		init();
@@ -34,35 +29,10 @@ public class Game {
 	
 	private void init(){
 		
+		Window window = new Window();
+		window.init();
+		
 		if (!glfwInit()) throw new IllegalStateException("Failed to Initialize");
-		
-		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-		
-		window = glfwCreateWindow(960, 540, "Pac-Trump", NULL, NULL);
-		if (window == NULL) throw new RuntimeException("Failed to create Window");
-		
-		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-			
-			if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) glfwSetWindowShouldClose(window, true);
-			
-		});
-		
-		try (MemoryStack stack = stackPush()){
-			IntBuffer pWidth = stack.mallocInt(1);
-			IntBuffer pHeight = stack.mallocInt(1);
-
-			glfwGetWindowSize(window, pWidth, pHeight);
-
-			GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-			
-			glfwSetWindowPos(window, (vidmode.width() - pWidth.get(0))/2, (vidmode.height() - pHeight.get(0))/2);
-		}
-		
-		glfwMakeContextCurrent(window);
-		glfwSwapInterval(1);
-		glfwShowWindow(window);
-		
 	}
 	
 	private void loop(){
@@ -89,7 +59,7 @@ public class Game {
 				2,3,0,
 		};
 		
-		Camera camera = new Camera(WIDTH, HEIGHT);
+		Camera camera = new Camera(window.getWidth(), window.getHeight());
 		
 		Model model = new Model(vertices, sprite, indices);
 		Shader shader = new Shader("shader");
@@ -104,10 +74,10 @@ public class Game {
 		
 		camera.setPosition(new Vector3f(0, 0, 0));
 		
-		while(!glfwWindowShouldClose(window)){
+		while(!window.shouldClose()){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			glfwPollEvents();
+			window.pollEvents();
 			
 			target = scale;
 			
@@ -117,15 +87,13 @@ public class Game {
 			pac.bind(0);
 			model.render();
 			
-			glfwSwapBuffers(window);
+			window.swapBuffers();
 		}
 		
 	}
 	
 	public static void main(String[] args){
-		
 		new Game();
-		
 	}
 	
 }
