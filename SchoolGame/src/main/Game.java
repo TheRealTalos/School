@@ -18,6 +18,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Game {
 	
+	Window window = new Window();
+	
 	public Game(){
 		
 		init();
@@ -28,11 +30,13 @@ public class Game {
 	}
 	
 	private void init(){
-		
-		Window window = new Window();
-		window.init();
+		GLFWErrorCallback.createPrint(System.err).set();
 		
 		if (!glfwInit()) throw new IllegalStateException("Failed to Initialize");
+		
+		window.setSize(960, 540);
+		window.setFullScreen(false);
+		window.init();
 	}
 	
 	private void loop(){
@@ -70,8 +74,6 @@ public class Game {
 				.translate(new Vector3f(0, 0, 0))
 				.scale(512);
 		
-		Matrix4f target = new Matrix4f();
-		
 		camera.setPosition(new Vector3f(0, 0, 0));
 		
 		while(!window.shouldClose()){
@@ -79,17 +81,14 @@ public class Game {
 			
 			window.pollEvents();
 			
-			target = scale;
-			
 			shader.bind();
 			shader.setUniform("sampler", 0);
-			shader.setUniform("projection", camera.getProjection().mul(target));
+			shader.setUniform("projection", camera.getProjection().mul(scale));
 			pac.bind(0);
 			model.render();
 			
 			window.swapBuffers();
 		}
-		
 	}
 	
 	public static void main(String[] args){

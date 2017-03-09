@@ -16,39 +16,55 @@ public class Window {
 
 	private int width = 960;
 	private int height = 540;
+	
+	private boolean fullScreen;
 
 	public Window() {
 
 	}
 
 	public void init() {
-
-		window = glfwCreateWindow(960, 540, "Pac-Trump", NULL, NULL);
-		if (window == NULL)
-			throw new RuntimeException("Failed to create Window");
-		
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+		
+		window = glfwCreateWindow(width, height, "Pac-Trump", fullScreen ? glfwGetPrimaryMonitor() : 0, 0);
+		if (window == NULL) throw new RuntimeException("Failed to create Window");
 
-		try (MemoryStack stack = stackPush()) {
-			IntBuffer pWidth = stack.mallocInt(1);
-			IntBuffer pHeight = stack.mallocInt(1);
+		glfwSetWindowPos(window, (getMonitorWidth() - width) / 2, (getMonitorHeight() - height) / 2);
+		
+		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
+				glfwSetWindowShouldClose(window, true); 
+		});
 
-			glfwGetWindowSize(window, pWidth, pHeight);
-
-			GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-			glfwSetWindowPos(window, (vidmode.width() - pWidth.get(0)) / 2, (vidmode.height() - pHeight.get(0)) / 2);
-		}
 
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		glfwShowWindow(window);
 
 	}
+	
+	public int getMonitorWidth(){
+		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		return vidmode.width();
+	}
+	
+	public int getMonitorHeight(){
+		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		return vidmode.height();
+	}
+	
+	public void setFullScreen(boolean full){
+		fullScreen = full;
+		if (full) setSize(getMonitorWidth(), getMonitorHeight());
+	}
+	
+	public boolean getFullScreen(){
+		return fullScreen;
+	}
 
 	public boolean shouldClose() {
-		return glfwWindowShouldClose(window) != 0;
+		return glfwWindowShouldClose(window);
 	}
 	
 	public void pollEvents(){
@@ -60,8 +76,8 @@ public class Window {
 	}
 	
 	public void setSize(int width, int height){
-		width = width;
-		height = height;
+		this.width = width;
+		this.height = height;
 	}
 	
 	public int getWidth() { return width; }
