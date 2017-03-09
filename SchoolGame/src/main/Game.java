@@ -18,7 +18,11 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Game {
 	
-	Window window = new Window();
+	Window window;
+	Camera camera;
+	TileRenderer tiles;
+	Shader shader;
+	Sprite pac;
 	
 	public Game(){
 		
@@ -34,9 +38,19 @@ public class Game {
 		
 		if (!glfwInit()) throw new IllegalStateException("Failed to Initialize");
 		
+		window = new Window();
+		
 		window.setSize(960, 540);
 		window.setFullScreen(false);
 		window.init();
+		
+		camera = new Camera(window.getWidth(), window.getHeight());
+		tiles = new TileRenderer();
+		shader = new Shader("shader");
+		pac = new Sprite("./res/sprites/PacMan.png");
+		
+		camera.setPosition(new Vector3f(0, 0, 0));
+		
 	}
 	
 	private void loop(){
@@ -44,48 +58,24 @@ public class Game {
 		
 		glClearColor(0,0,0,0);
 		
-		float[] vertices = new float[]{
-			-0.5f,	0.5f, 0,
-			0.5f,	0.5f, 0,
-			0.5f,	-0.5f, 0, 
-			-0.5f,	-0.5f, 0,
-		};
-		
-		float[] sprite = new float[]{
-				0, 0,
-				1, 0,
-				1, 1,
-				0, 1,
-		};
-		
-		int[] indices = new int[]{
-				0,1,2,
-				2,3,0,
-		};
-		
-		Camera camera = new Camera(window.getWidth(), window.getHeight());
-		
-		Model model = new Model(vertices, sprite, indices);
-		Shader shader = new Shader("shader");
-		
-		Sprite pac = new Sprite("./res/sprites/PacMan.png");
-		
 		Matrix4f scale = new Matrix4f()
 				.translate(new Vector3f(0, 0, 0))
 				.scale(512);
-		
-		camera.setPosition(new Vector3f(0, 0, 0));
 		
 		while(!window.shouldClose()){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			window.pollEvents();
 			
-			shader.bind();
-			shader.setUniform("sampler", 0);
-			shader.setUniform("projection", camera.getProjection().mul(scale));
-			pac.bind(0);
-			model.render();
+			for (int i = 0; i < 8; i++){
+				tiles.renderTile(0, i, 0, shader, scale, camera);
+			}
+			
+//			shader.bind();
+//			shader.setUniform("sampler", 0);
+//			shader.setUniform("projection", camera.getProjection().mul(scale));
+//			pac.bind(0);
+//			model.render();
 			
 			window.swapBuffers();
 		}

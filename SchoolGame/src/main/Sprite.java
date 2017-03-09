@@ -21,7 +21,7 @@ public class Sprite {
 		BufferedImage image;
 
 		try {
-			image = ImageIO.read(new File(file));
+			image = ImageIO.read(new File("./sprites/" + file));
 			width = image.getWidth();
 			height = image.getHeight();
 
