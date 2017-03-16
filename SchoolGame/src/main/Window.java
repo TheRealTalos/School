@@ -31,19 +31,18 @@ public class Window {
 		if (window == NULL) throw new RuntimeException("Failed to create Window");
 
 		glfwSetWindowPos(window, (getMonitorWidth() - width) / 2, (getMonitorHeight() - height) / 2);
-		
-		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-				glfwSetWindowShouldClose(window, true); 
-		});
-
 
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		glfwShowWindow(window);
-
 	}
 	
+	
+	
+	public long getWindow() {
+		return window;
+	}
+
 	public int getMonitorWidth(){
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		return vidmode.width();

@@ -20,9 +20,10 @@ public class Game {
 	
 	Window window;
 	Camera camera;
-	TileRenderer tiles;
+	World world;
+	TileRenderer tileRenderer;
 	Shader shader;
-	Sprite pac;
+	Player player;
 	
 	public Game(){
 		
@@ -43,14 +44,6 @@ public class Game {
 		window.setSize(960, 540);
 		window.setFullScreen(false);
 		window.init();
-		
-		camera = new Camera(window.getWidth(), window.getHeight());
-		tiles = new TileRenderer();
-		shader = new Shader("shader");
-		pac = new Sprite("./res/sprites/PacMan.png");
-		
-		camera.setPosition(new Vector3f(0, 0, 0));
-		
 	}
 	
 	private void loop(){
@@ -58,24 +51,34 @@ public class Game {
 		
 		glClearColor(0,0,0,0);
 		
-		Matrix4f scale = new Matrix4f()
-				.translate(new Vector3f(0, 0, 0))
-				.scale(512);
+		world = new World(128, 128, 64);
+		
+		tileRenderer = new TileRenderer();
+		shader = new Shader("shader");
+		player = new Player();
+		camera = new Camera(window.getWidth(), window.getHeight());
+		camera.setPosition(new Vector3f(0, 0, 0));
+		
+		glfwSetKeyCallback(window.getWindow(), (window, key, scancode, action, mods) -> {
+			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE ) glfwSetWindowShouldClose(window, true);
+			
+		});
 		
 		while(!window.shouldClose()){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
+			player.update(144, window, camera, world);
+			
 			window.pollEvents();
 			
-			for (int i = 0; i < 8; i++){
-				tiles.renderTile(0, i, 0, shader, scale, camera);
-			}
+			world.correctCamera(window, camera);
 			
-//			shader.bind();
-//			shader.setUniform("sampler", 0);
-//			shader.setUniform("projection", camera.getProjection().mul(scale));
-//			pac.bind(0);
-//			model.render();
+			world.render(tileRenderer, shader, camera, window);
+			
+			player.render(shader, camera);
+			
+			world.setTile(Tile.feelsBad, 0, 0);
+			world.setTile(Tile.feelsBad, 63, 63);
 			
 			window.swapBuffers();
 		}

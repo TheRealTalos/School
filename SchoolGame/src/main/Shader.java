@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.omg.CORBA.PUBLIC_MEMBER;
 
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL20.*;
 
 public class Shader {
@@ -72,6 +73,7 @@ public class Shader {
 		if (location != -1){
 			glUniformMatrix4fv(location, false, buffer);
 		}
+		
 	}
 
 	private String readFile(String file) {
@@ -95,6 +97,14 @@ public class Shader {
 	
 	public void bind(){
 		glUseProgram(program);
+	}
+	
+	protected void finalize(){
+		glDetachShader(program, vs);
+		glDetachShader(program, fs);
+		glDeleteShader(vs);
+		glDeleteShader(fs);
+		glDeleteProgram(program);
 	}
 	
 }
